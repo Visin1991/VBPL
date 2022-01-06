@@ -10,6 +10,57 @@ bl_info = {
 }
 
 import bpy
+import bmesh
+import bpy_extras
+import bpy_extras.mesh_utils
+
+class ProcessMesh(bpy.types.Operator):
+    bl_idname = "object.process_mesh"
+    bl_label = "Process a mesh......"
+    def execute(self,context):
+        ob = context.object
+        me = ob.data
+        scene = context.scene
+
+        bpy.ops.object.mode_set(mode ='EDIT') 
+        bm = bmesh.from_edit_mesh(me)
+
+        bm.select_mode = {'FACE'}
+        faceGroups = []
+        bpy.ops.mesh.select_mode(use_extend=False, use_expand=False, type='FACE')
+
+        
+        save_sync = scene.tool_settings.use_uv_select_sync
+        scene.tool_settings.use_uv_select_sync = True
+        faces = set(bm.faces[:])
+        bm.free()
+        
+        while faces:
+            bpy.ops.mesh.select_all(action='DESELECT')  
+            face = faces.pop() 
+            face.select = True
+            bpy.ops.uv.select_linked()
+            selected_faces = {f for f in faces if f.select}
+            selected_faces.add(face) # this or bm.faces above?
+            faceGroups.append(selected_faces)
+            faces -= selected_faces
+
+        scene.tool_settings.use_uv_select_sync = save_sync
+
+        for group in faceGroups:
+            print("Process UV Island......")
+            for face in group:
+                print("Process a face......")
+                #bmesh.types.BMesh.faces
+                #bmesh.types.BMFace.loops
+                #bmesh.types.BMLoop
+                for bmloop in face.loops:
+                    print(bmloop.index)
+
+        bpy.ops.object.mode_set(mode ='OBJECT') 
+        
+
+        return {'FINISHED'}
 
 class SimpleOperator(bpy.types.Operator):
     bl_idname = "object.simple_operator"
@@ -41,12 +92,16 @@ class SimplePanel(bpy.types.Panel):
     bl_region_type = "UI"
     bl_category = "Simple Addon"
     bl_label = "Call Simple Operator"
-    bl_context = "objectmode"
+    #bl_context = "objectmode"
 
     def draw(self, context):
-        self.layout.operator("object.simple_operator",
-        text="Print Encouraging Message")
+        self.layout.operator("object.simple_operator",text="Print Encouraging Message")
         self.layout.prop(context.scene, 'encouraging_message')
+
+        self.layout.split()
+        self.layout.operator("object.process_mesh",text="Print all mesh island")
+
+
 
     @classmethod
     def register(cls):
@@ -60,6 +115,7 @@ class SimplePanel(bpy.types.Panel):
         # Delete parameters related to the class here
 
 classes = (
+   ProcessMesh, 
    SimpleOperator,
    SimplePanel,
 )
