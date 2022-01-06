@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "./python/bin/python.exe",
+    "python.autoComplete.extraPaths": [
+        
+    ],
+    "python.analysis.extraPaths": [
+        
+    ],
+}
