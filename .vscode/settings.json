@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "./python/bin/python.exe",
+    "python.defaultInterpreterPath": "../python/bin/python.exe",
     "python.autoComplete.extraPaths": [
         
     ],
