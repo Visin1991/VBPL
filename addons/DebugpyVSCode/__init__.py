@@ -1,6 +1,6 @@
 bl_info = {
    'name': 'DebugpyVSCode',
-   'author': 'Visin',
+   'author': 'VV',
    'version': (1, 0, 0),
    'blender': (2, 90, 0),
    "description": "Blender Remote debugpy for VS Code",
