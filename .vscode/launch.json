@@ -17,7 +17,8 @@
                     "localRoot": "${workspaceFolder}",
                     "remoteRoot": "${workspaceFolder}"
                 }
-            ]
+            ],
+            "justMyCode": true
         }
     ]
 }

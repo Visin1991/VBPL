@@ -23,9 +23,8 @@ class DebugPyPreferences(bpy.types.AddonPreferences):
       layout = self.layout
       row_port = layout.split()
       row_port.prop(self, "port")
-      row_port.label(text="port : Listen to VS Code Debug")
 
-class DebugPyOperator(bpy.types.Operator):
+class VBPL_OT_DebugPyOperator(bpy.types.Operator):
    bl_idname = "debugpy.listen_vscode_debug"
    bl_label = "Debugpy: Listen VS Code Debug"
    bl_description = "Starts debugpy Listen VS Code Debug"
@@ -48,9 +47,9 @@ class DebugPyOperator(bpy.types.Operator):
 
       return {"FINISHED"}
 
-class DebugPyMenu(bpy.types.Menu):
+class VIEW3D_MT_DebugPyMenu(bpy.types.Menu):
    bl_label = "DebugPy"
-   bl_idname = "view3D.DebugPy"
+   bl_idname = "VIEW3D_MT_DebugPy"
    
    def menu_func(self,context):
       layout = self.layout
@@ -69,8 +68,8 @@ class DebugPyMenu(bpy.types.Menu):
       
 classes = (
    DebugPyPreferences,
-   DebugPyOperator,
-   DebugPyMenu,
+   VBPL_OT_DebugPyOperator,
+   VIEW3D_MT_DebugPyMenu,
 )
 
 register, unregister = bpy.utils.register_classes_factory(classes)

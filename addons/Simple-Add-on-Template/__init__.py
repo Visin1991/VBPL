@@ -40,8 +40,10 @@ def Test_Print_UV_MiniMax(context):
     y_min = uv_data_y[-1]
     print("UV bounding box : {},{},{},{}".format(x_max,x_min,y_max,y_min))
 
-    
 def Test_Unwrap_UV(context:bpy.context):
+    print("Hello World!!!!!!")
+    
+def Test_LocalUnwrap_UV(context:bpy.context):
     context = bpy.context
     ob = context.edit_object
     if ob is None:
@@ -56,13 +58,13 @@ def Test_Unwrap_UV(context:bpy.context):
     uv_layer = bm.loops.layers.uv.active
 
     # Get Selected UV data
-    uv_data = []
+    # uv_data = []
     uv_data_x =[]
     uv_data_y =[]
     for f in selfaces:
         for loop in f.loops:
             uv = loop[uv_layer].uv
-            uv_data.append(uv_data)
+            #uv_data.append(uv)
             uv_data_x.append(uv.x)
             uv_data_y.append(uv.y)
     
@@ -74,13 +76,9 @@ def Test_Unwrap_UV(context:bpy.context):
     y_max = uv_data_y[0]
     y_min = uv_data_y[-1]
 
-    # Calculate UV size 
-    x_size = x_max - x_min
-    y_size = y_max - y_min
-    x_center = x_min + x_size * 0.5
-    y_center = y_min + y_size * 0.5
-
-
+    target_origin = mathutils.Vector((x_max,y_max))
+    target_size = mathutils.Vector((x_max - x_min,y_max - y_min)) 
+    
     # unwrap the uv
     bpy.ops.uv.unwrap()
 
@@ -90,7 +88,7 @@ def Test_Unwrap_UV(context:bpy.context):
     for f in selfaces:
         for loop in f.loops:
             uv = loop[uv_layer].uv
-            new_uv_data.append(uv_data)
+            new_uv_data.append(uv)
             new_uv_data_x.append(uv.x)
             new_uv_data_y.append(uv.y)
     
@@ -102,10 +100,26 @@ def Test_Unwrap_UV(context:bpy.context):
     y_max = new_uv_data_y[0]
     y_min = new_uv_data_y[-1]
 
-    new_x_size = x_max - x_min
-    new_y_size = y_max - y_min
-    new_x_center = x_min + x_size * 0.5
-    new_y_center = y_min + y_size * 0.5
+    new_model_space_origin = mathutils.Vector((x_max,y_max)) 
+    new_model_space_size = mathutils.Vector((x_max - x_min,y_max - y_min)) 
+    
+
+    offset = target_origin - new_model_space_origin
+    scale_x = (target_size.x) / (new_model_space_size.x)
+    scale_y = (target_size.y) / (new_model_space_size.y)
+    
+    for f in selfaces:
+        for loop in f.loops:
+            new_world_space_uv = loop[uv_layer].uv
+            new_model_space_uv = new_world_space_uv + new_model_space_origin
+            target_space_uv_x = new_model_space_uv.x * scale_x + offset.x
+            target_space_uv_y = new_model_space_uv.y * scale_y + offset.y
+            loop[uv_layer].uv = mathutils.Vector((target_space_uv_x,target_space_uv_y))
+            
+
+
+        
+    
             
 
 def Test_Porcess_UV_Island(context):
@@ -186,7 +200,7 @@ class SimpleOperator(bpy.types.Operator):
         del bpy.types.Scene.encouraging_message
 
 # A simple button and input field in the Tools panel
-class SimplePanel(bpy.types.Panel):
+class VBPL_PT_SimplePanel(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Simple Addon"
@@ -216,7 +230,7 @@ class SimplePanel(bpy.types.Panel):
 classes = (
    Print_UV_Island, 
    SimpleOperator,
-   SimplePanel,
+   VBPL_PT_SimplePanel,
 )
 
 register, unregister = bpy.utils.register_classes_factory(classes)
