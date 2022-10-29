@@ -27,7 +27,6 @@ class Bake_OT_InputImage(bpy.types.Operator):
         for o in context.selected_objects:
             if o.type == 'MESH':
                 for m in bpy.data.objects[o.name].material_slots:
-
                     m.material.use_nodes = True
                     node_tree = bpy.data.materials[m.material.name].node_tree
 
@@ -89,36 +88,20 @@ class BAKESELECTED_PT_Panel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
-        tex = context.texture
-        space = context.space_data
-        pin_id = space.pin_id
-        use_pin_id = space.use_pin_id
-        user = context.texture_user
-
-
         col = layout.column()
 
-        if not (use_pin_id and isinstance(pin_id, bpy.types.Texture)):
-            pin_id = None
+        # https://docs.blender.org/manual/en/latest/render/materials/legacy_textures/index.html
+        # 检测是否设置了Procedual Texture
+        if context.texture_user:
+            propname = context.texture_user_property.identifier
+            col.template_ID(context.texture_user, propname, new="texture.new")
 
-        if not pin_id:
-            col.template_texture_user()
-
-        if user or pin_id:
+        # 选择Procedual Texture Type
+        if context.texture:
             col.separator()
-
-            if pin_id:
-                col.template_ID(space, "pin_id")
-            else:
-                propname = context.texture_user_property.identifier
-                col.template_ID(user, propname, new="texture.new")
-
-            if tex:
-                col.separator()
-
-                split = col.split(factor=0.2)
-                split.label(text="Type")
-                split.prop(tex, "type", text="")
+            split = col.split(factor=0.2)
+            split.label(text="Type")
+            split.prop(context.texture, "type", text="")
 
         layout = self.layout
 
@@ -131,10 +114,15 @@ class BAKESELECTED_PT_Panel(bpy.types.Panel):
         row.operator("obj.bake_image",icon='RENDER_STILL')
 
         row = col.row(align=True)
-        tex = context.texture
 
-        if tex:
-            layout.template_image(tex, "image", tex.image_user)
+        if context.texture:  
+            if type(context.texture) == bpy.types.ImageTexture:
+                # Link to a ImageUser......
+                layout.template_image(context.texture, "image", context.texture.image_user)
+            else:
+                layout.label(text="Texture No ImageUser!!!")
+
+# -------------------------------------------------------------------------------------------------------
 
 classes = (
     Bake_OT_InputImage,
