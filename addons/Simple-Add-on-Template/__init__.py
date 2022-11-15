@@ -8,13 +8,20 @@ bl_info = {
     "wiki_url": "www.google.com",
     "category": "Development"
 }
-
+import os
 from bmesh.types import BMFace
 import bpy
 import bmesh
 import bpy_extras
 import bpy_extras.mesh_utils
 import mathutils
+
+def Get_All_Scene_Object_Names(context:bpy.context):
+    return set([o.name for o in context.scene.objects])
+
+def Get_New_Imported_Object_From_Names(context:bpy.context,names_pre:set[str],names_post:set[str])->bpy.types.Object:
+    new_object_name = names_post.difference(names_pre).pop()
+    return context.scene.objects[new_object_name]
 
 def Test_Print_UV_MiniMax(context):
     # Get all UV Datas
@@ -117,11 +124,6 @@ def Test_LocalUnwrap_UV(context:bpy.context):
             loop[uv_layer].uv = mathutils.Vector((target_space_uv_x,target_space_uv_y))
             
 
-
-        
-    
-            
-
 def Test_Porcess_UV_Island(context):
     ob = context.object
     me = ob.data
@@ -199,6 +201,43 @@ class SimpleOperator(bpy.types.Operator):
         # Delete parameters related to the class here
         del bpy.types.Scene.encouraging_message
 
+class OPT_Test_SVG(bpy.types.Operator):
+    bl_idname = "object.test_svg"
+    bl_label = "Test SVG"
+
+    def execute(self, context):
+        names_pre_import = Get_All_Scene_Object_Names(context)
+
+        cfp = os.path.dirname(os.path.realpath(__file__))
+        svg_path = cfp + "/svg.svg"
+        bpy.ops.import_curve.svg(filepath=svg_path)
+
+        names_post_import = Get_All_Scene_Object_Names(context)
+        svg_curve = Get_New_Imported_Object_From_Names(context,names_pre_import,names_post_import)
+        
+        svg_curve.select_set(True)
+        context.view_layer.objects.active = svg_curve
+
+        #Cast Object to Curve 会导致后续访问变量时各种失败、所以还是只能用bpy.context.object.data 的来访问
+
+        # bpy.types.Curve.dimensions = '3D'
+        bpy.context.object.data.dimensions = '3D'
+
+        # 设置曲线为非闭环曲线
+        # bpy.types.Curve.splines[0].use_cyclic_u = False
+        bpy.context.object.data.splines[0].use_cyclic_u = False
+
+        # 设置带状模型宽度
+        # bpy.types.Curve.extrude = 0.01
+        bpy.context.object.data.extrude = 0.01
+
+        #转为3D 模型
+        bpy.ops.object.convert(target='MESH')
+
+
+        return {'FINISHED'}
+
+
 # A simple button and input field in the Tools panel
 class VBPL_PT_SimplePanel(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
@@ -214,7 +253,8 @@ class VBPL_PT_SimplePanel(bpy.types.Panel):
         self.layout.split()
         self.layout.operator("object.process_mesh",text="Print all mesh island")
 
-
+        self.layout.split()
+        self.layout.operator("object.test_svg",text="Test SVG")
 
     @classmethod
     def register(cls):
@@ -230,6 +270,7 @@ class VBPL_PT_SimplePanel(bpy.types.Panel):
 classes = (
    Print_UV_Island, 
    SimpleOperator,
+   OPT_Test_SVG,
    VBPL_PT_SimplePanel,
 )
 
