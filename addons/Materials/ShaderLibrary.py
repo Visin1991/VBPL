@@ -126,21 +126,3 @@ class SHADER_OT_DIAMOND(bpy.types.Operator):
         bpy.context.object.active_material = material_diamond
         
         return {'FINISHED'}
-        
-        
-        
-        
-
-        
-        
-def register():
-    bpy.utils.register_class(ShaderMainPanel)
-    bpy.utils.register_class(SHADER_OT_DIAMOND)
-    
-def unregister():
-    bpy.utils.unregister_class(ShaderMainPanel)
-    bpy.utils.unregister_class(SHADER_OT_DIAMOND)
-    
-    
-if __name__ == "__main__":
-    register()
