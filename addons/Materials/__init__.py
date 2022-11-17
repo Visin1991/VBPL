@@ -15,13 +15,14 @@ bl_info = {
 }
 
 
-def register():
-    bpy.utils.register_class(ShaderMainPanel)
-    bpy.utils.register_class(SHADER_OT_DIAMOND)
-    
-def unregister():
-    bpy.utils.unregister_class(ShaderMainPanel)
-    bpy.utils.unregister_class(SHADER_OT_DIAMOND)
+classes = (
+   ShaderMainPanel, 
+   SHADER_OT_DIAMOND,
+   Material_PT_Function,
+   Material_Function_OT_UV_Tile
+)
+
+register, unregister = bpy.utils.register_classes_factory(classes)
     
 if __name__ == "__main__":
     register()

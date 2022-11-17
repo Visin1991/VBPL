@@ -11,6 +11,7 @@ bl_info = {
 }
 
 import bpy
+from .npr_eve import *
 
 class ShaderMainPanel(bpy.types.Panel):
     bl_label = "Shader Library"
@@ -125,4 +126,28 @@ class SHADER_OT_DIAMOND(bpy.types.Operator):
         
         bpy.context.object.active_material = material_diamond
         
+        return {'FINISHED'}
+
+# =======================================================================================================
+# Blender Material Functions
+
+class Material_PT_Function(bpy.types.Panel):
+    bl_label = "Material Functions"
+    bl_idname = "MATERIAL_FUNCTION_PL"
+    bl_space_type = "NODE_EDITOR"
+    bl_region_type = "UI"
+    bl_category = "Material Functions"
+    
+    def draw(self,context):
+        layout = self.layout  
+        row = layout.row()
+        row.label(text="UV_Tile")
+        row.operator("mf.uv_tile")
+
+class Material_Function_OT_UV_Tile(bpy.types.Operator):
+    bl_label = "UV_Tile"
+    bl_idname = "mf.uv_tile"
+    
+    def execute(self,context):    
+        print("Hello World")
         return {'FINISHED'}
