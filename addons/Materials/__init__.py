@@ -19,7 +19,10 @@ classes = (
    ShaderMainPanel, 
    SHADER_OT_DIAMOND,
    Material_PT_Function,
-   Material_Function_OT_UV_Tile
+   Material_Function_OT_UV_Tile,
+   Material_Function_OT_Brick,
+   Material_Function_OT_UV_Loop,
+   Material_Function_OT_UV_PingPong_Loop
 )
 
 register, unregister = bpy.utils.register_classes_factory(classes)
