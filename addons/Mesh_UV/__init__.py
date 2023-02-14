@@ -14,6 +14,11 @@ import bmesh
 import mathutils
 
 def main(context):
+   
+    # Loop though all selected objects ......
+    
+    # Make the seletect object to Editor Mode
+    bpy.ops.object.mode_set(mode='EDIT')
     context = bpy.context
     ob = context.edit_object
     if ob is None:
