@@ -13,13 +13,7 @@ import bpy
 import bmesh
 import mathutils
 
-counter = 0
-
 def main(context):
-    print("------------------------------")
-    global counter
-    print(counter)
-    counter += 1
     context = bpy.context
     ob = context.edit_object
     if ob is None:
@@ -29,7 +23,7 @@ def main(context):
 
     me = ob.data
     bm = bmesh.from_edit_mesh(me)
-    # bm.normal_update()
+    bm.normal_update()
 
     uv01 = bm.loops.layers.uv.get("uv_01")
     uv02 = bm.loops.layers.uv.get("uv_02")
