@@ -13,8 +13,13 @@ import bpy
 import bmesh
 import mathutils
 
+counter = 0
 
 def main(context):
+    print("------------------------------")
+    global counter
+    print(counter)
+    counter += 1
     context = bpy.context
     ob = context.edit_object
     if ob is None:
@@ -24,7 +29,7 @@ def main(context):
 
     me = ob.data
     bm = bmesh.from_edit_mesh(me)
-    bm.normal_update()
+    # bm.normal_update()
 
     uv01 = bm.loops.layers.uv.get("uv_01")
     uv02 = bm.loops.layers.uv.get("uv_02")
@@ -55,7 +60,7 @@ def main(context):
             loop[uv02].uv = mathutils.Vector((ob.location.z,world_face_normal.x))
             loop[uv03].uv = mathutils.Vector((world_face_normal.y,world_face_normal.z))
             
-    bm.free()
+    # bm.free()
 
 
 
