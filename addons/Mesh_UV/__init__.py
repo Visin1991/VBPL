@@ -15,39 +15,48 @@ import mathutils
 
 
 def main(context):
-    '''obj = context.active_object
-    me = obj.data
-    bm = bmesh.from_edit_mesh(me)a
-
-    uv_layer = bm.loops.layers.uv.verify()
-
-    # adjust uv coordinates
-    for face in bm.faces:
-        for loop in face.loops:
-            loop_uv = loop[uv_layer]
-            # use xy position of the vertex as a uv coordinate
-            loop_uv.uv = loop.vert.co.xy
-
-    bmesh.update_edit_mesh(me)'''
-    
-    bpy.context.active_object.data.uv_layers.new(name='uv_02')
     context = bpy.context
     ob = context.edit_object
     if ob is None:
         print("Not in selected mode")
         return
 
+
     me = ob.data
     bm = bmesh.from_edit_mesh(me)
-    
+    bm.normal_update()
+
+    uv01 = bm.loops.layers.uv.get("uv_01")
     uv02 = bm.loops.layers.uv.get("uv_02")
+    uv03 = bm.loops.layers.uv.get("uv_03")
+
+    if uv01 is None:
+        bpy.context.active_object.data.uv_layers.new(name='uv_01')
+        uv01 = bm.loops.layers.uv.get("uv_01")
+    if uv02 is None:
+        bpy.context.active_object.data.uv_layers.new(name='uv_02')
+        uv02 = bm.loops.layers.uv.get("uv_02")
+    if uv03 is None:
+        bpy.context.active_object.data.uv_layers.new(name='uv_03')
+        uv03 = bm.loops.layers.uv.get("uv_03")
+
+    wmtx = ob.matrix_world
 
     for f in bm.faces:
+        # Convert normal from local space to World space
+        local_face_normal = f.normal
+        world_face_normal = wmtx.to_3x3().inverted().transposed() @ local_face_normal
+        world_face_normal.normalize()
+    
+        # Save world position and normal to uvs
         for loop in f.loops:
-            print(loop[uv02].uv)
-            loop[uv02].uv = mathutils.Vector((0,0))
+            # 注意ob使用的是location, 并非Worldlocation, 因此注意Object不要有父子结构
+            loop[uv01].uv = mathutils.Vector((ob.location.x,ob.location.y))
+            loop[uv02].uv = mathutils.Vector((ob.location.z,world_face_normal.x))
+            loop[uv03].uv = mathutils.Vector((world_face_normal.y,world_face_normal.z))
+            
+    bm.free()
 
-    print(uv02)
 
 
 class MeshPositionToUV2Operator(bpy.types.Operator):
