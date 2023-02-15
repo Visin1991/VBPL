@@ -11,6 +11,7 @@ bl_info = {
 
 import bpy
 import bmesh
+import math
 import mathutils
 
 def main(context):
@@ -104,7 +105,7 @@ class MeshPositionToUV2Operator(bpy.types.Operator):
 
             # Applay scale and reset position rotation to 0
             copy_obj.location = mathutils.Vector((0,0,0))
-            copy_obj.rotation_euler = mathutils.Vector((0,0,0))
+            copy_obj.rotation_euler = mathutils.Vector((math.radians(90),0,0))
             bpy.ops.object.transform_apply(location=True,scale=True,rotation=True)
 
             copy_obj.select_set(False)
