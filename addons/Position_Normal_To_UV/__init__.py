@@ -54,6 +54,7 @@ def main(context):
         local_face_normal = f.normal
         world_face_normal = wmtx.to_3x3().inverted().transposed() @ local_face_normal
         world_face_normal.normalize()
+        print(world_face_normal)
     
         # Save world position and normal to uvs
         for loop in f.loops:
@@ -110,6 +111,7 @@ class MeshPositionToUV2Operator(bpy.types.Operator):
             copy_obj.location = mathutils.Vector((0,0,0))
             copy_obj.rotation_euler = mathutils.Vector((math.radians(90),0,math.radians(90)))
             bpy.ops.object.transform_apply(location=True,scale=True,rotation=False)
+            # bpy.ops.object.transform_apply(location=True,scale=True,rotation=True)
 
             copy_obj.select_set(False)
             
