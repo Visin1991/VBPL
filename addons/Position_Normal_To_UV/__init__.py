@@ -14,6 +14,9 @@ import bmesh
 import math
 import mathutils
 
+
+# Export fbx to UE4 : -x Forward and Z Up
+
 def main(context):
    
     # Make the seletect object to Editor Mode
@@ -105,7 +108,7 @@ class MeshPositionToUV2Operator(bpy.types.Operator):
 
             # Applay scale and reset position rotation to 0
             copy_obj.location = mathutils.Vector((0,0,0))
-            copy_obj.rotation_euler = mathutils.Vector((math.radians(90),0,0))
+            copy_obj.rotation_euler = mathutils.Vector((math.radians(90),0,math.radians(90)))
             bpy.ops.object.transform_apply(location=True,scale=True,rotation=False)
 
             copy_obj.select_set(False)
